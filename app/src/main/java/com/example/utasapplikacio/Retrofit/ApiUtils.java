@@ -4,7 +4,7 @@ public class ApiUtils {
     private ApiUtils() {
     }
 
-    public static final String BASE_URL = "http://webtraffic.conveyor.cloud/api/";
+    public static final String BASE_URL = "http://192.168.0.126:45455/api/";
 
     public static UserService getAPIService() {
 

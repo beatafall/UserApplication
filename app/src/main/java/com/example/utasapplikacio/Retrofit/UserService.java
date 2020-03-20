@@ -21,11 +21,12 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
+import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface UserService {
-    String BASE_URL = "http://webtraffic.conveyor.cloud/api/";
+    String BASE_URL = "http://192.168.0.126:45455/api/";
 
     @GET("line")
     Call<List<Line>> getLines();
@@ -44,6 +45,11 @@ public interface UserService {
 
     @GET("allbus")
     Call<List<Bus>> getAllBuses();
+
+    @POST("message/")
+    @FormUrlEncoded
+    Call<Messages> sendMessage(@Field("jelzesId") String messageTypeId, @Field("vonalId") String line,
+                               @Field("datum") String date, @Field("lon") String lon, @Field("lat") String lat);
 
 //    @FormUrlEncoded
 //    @PUT("busesontheroad/{buszId}/")
