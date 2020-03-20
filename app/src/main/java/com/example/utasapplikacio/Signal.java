@@ -67,7 +67,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
         btn_getCurentTime = findViewById(R.id.btn_time);
         btn_update = findViewById(R.id.update);
 
-        //final BusesOnTheRoad busesOnTheRoad = new BusesOnTheRoad();
+        final UpdateLine updateLine = new UpdateLine();
 
         btn_getCurentTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,8 +76,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
                 String currentDateandTime = sdf.format(new Date());
                 currentTime.setText(currentDateandTime);
-               //busesOnTheRoad.setDate(currentDateandTime);
-              // Log.d("date",busesOnTheRoad.getDate().toString());
+                updateLine.setDate(currentDateandTime);
             }
         });
 
@@ -98,17 +97,9 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
 
         onLocationChanged(location);
 
-       // busesOnTheRoad.setLat(location.getAltitude());
-      //  Log.d("lat", busesOnTheRoad.getLat().toString());
-      //  busesOnTheRoad.setLon(location.getLongitude());
-      //  Log.d("lon", busesOnTheRoad.getLon().toString());
+        updateLine.setLat(location.getLongitude());
+        updateLine.setLon(location.getLatitude());
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(UserService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-       // userService = retrofit.create(UserService.class);
         userService= ApiUtils.getAPIService();
 
         Call<List<Line>> call = userService.getLines();
@@ -133,9 +124,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         selectedLine = line.getSelectedItem().toString();
-                        Log.d("d", selectedLine);
-                        //busesOnTheRoad.setLine(Integer.parseInt(selectedLine));
-                       // Log.d("line", busesOnTheRoad.getLine().toString());
+                        updateLine.setLine(selectedLine);
                     }
 
                     @Override
@@ -173,10 +162,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         selectedBus=bus.getSelectedItem().toString();
-                        Log.d("d",selectedBus);
-
-                        //busesOnTheRoad.setBus(Integer.parseInt(selectedBus));
-                        //Log.d("line", busesOnTheRoad.getBus().toString());
+                        updateLine.setBus(selectedBus);
                     }
 
                     @Override
@@ -196,54 +182,30 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
         btn_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // updateLine(123,4,46.55090,46.55090,"2020-03-12 12:11");
-                updateLine(123);
+               updateLine(updateLine.getBus(),updateLine.getLine(),updateLine.getLon(),updateLine.getLat(),updateLine.getDate());
             }
         });
 
 
     }
 
-    public void updateLine(int bus){
-       UpdateLine line=new UpdateLine(4,123,"46.55090","24.55590","2020-03-12 12:11");
-        Log.d("eler","eler1 " + line.getBus() + line.getDate() + line.getLine() + line.getLat() + line.getLon());
+    public void updateLine(String bus,String line, Double lon, Double lat, String date){
 
-       // userService.updateLine(bus,line,bus,lat,lon,date).enqueue(new Callback<BusesOnTheRoad>() {
-       // userService.updateLine(bus,4,123,"46.55090","24.55590","2020-03-12 12:11").enqueue(new Callback<UpdateLine>() {
-
-        //JSONARRAY ?????
-
-       /* Call<JSONArray> callUpdate = userService.updateLine(bus,String.valueOf(datas));
-        callUpdate.enqueue(new Callback<JSONArray>() {
+       userService.updateLine(bus,line,bus, lon, lat, date).enqueue(new Callback<UpdateLine>() {
             @Override
-            public void onResponse(Call<JSONArray> call, Response<JSONArray> response) {
-                Log.d("eler","eler2");
-
-                try {
-                    JSONArray val = response.body();
-                    Log.d("eler","eler4"+val);
-
-                } catch (Exception e) {
-                    e.getMessage();
-                    Log.d("eler","eler5");
-                }
-
+            public void onResponse(Call<UpdateLine> call, Response<UpdateLine> response) {
                 if(response.isSuccessful()){
-
-                    Toast.makeText(Signal.this, "Line updated successfully!", Toast.LENGTH_SHORT).show();
-                    Log.d("eler","eler3");
-                    Log.d("eler",response.body().toString());
-
+                    Toast.makeText(Signal.this, "Sikeresen frissítette a busz helyzetét!", Toast.LENGTH_SHORT).show();
+                    Log.d("successful","successful");
                 }
             }
 
             @Override
-            public void onFailure(Call<JSONArray> call, Throwable t) {
-                Log.e("ERROR: ", t.getMessage());
-                Log.d("eler","elererror");
+            public void onFailure(Call<UpdateLine> call, Throwable t) {
+                Toast.makeText(Signal.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("not successful","not successful");
             }
         });
-*/
 
     }
 

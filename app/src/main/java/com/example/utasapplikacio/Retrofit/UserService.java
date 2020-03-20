@@ -51,24 +51,10 @@ public interface UserService {
     Call<Messages> sendMessage(@Field("jelzesId") String messageTypeId, @Field("vonalId") String line,
                                @Field("datum") String date, @Field("lon") String lon, @Field("lat") String lat);
 
-//    @FormUrlEncoded
-//    @PUT("busesontheroad/{buszId}/")
-//    Call<UpdateLine> updateLine(@Path("buszId") int id, @Field("vonalId") int line,@Field("buszId") int bus,
-//                                    @Field("lon") String lon,@Field("lat") String lat,
-//                                    @Field("datum") String date);
-
-    //@FormUrlEncoded
-   // @PUT("busesontheroad/{buszId}")
-   // Call<UpdateLine> updateLine(@Path("buszId") int id, String json);
-
-    //string, jsonarray,updateline ???
-//     @FormUrlEncoded
-//     @PUT("busesontheroad/{buszId}")
-//     Call<String> updateLine(@Path("buszId") int id, @Field("vonalId") int line, @Field("buszId") int bus,
-//                                @Field("lon") String lon, @Field("lat") String lat,
-//                                @Field("datum") String date);
-
     @FormUrlEncoded
-    @PUT("busesontheroad/{buszId}")
-    Call<JSONArray> updateLine(@Path("buszId") int id, @Body String data);
+    @PUT("busesontheroad/{buszId}/")
+    Call<UpdateLine> updateLine(@Path("buszId") String id, @Field("vonalId") String line,
+                                @Field("buszId") String bus, @Field("lon") Double lon,
+                                @Field("lat") Double lat, @Field("datum") String date);
+
 }

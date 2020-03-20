@@ -6,23 +6,23 @@ import com.google.gson.annotations.SerializedName;
 public class UpdateLine {
     @SerializedName("vonalId")
     @Expose
-    private int line;
+    private String line;
     @SerializedName("buszId")
     @Expose
-    private int bus;
-    @SerializedName("lat")
-    @Expose
-    private String lat;
+    private String bus;
     @SerializedName("lon")
     @Expose
-    private String lon;
+    private Double lon;
+    @SerializedName("lat")
+    @Expose
+    private Double lat;
     @SerializedName("datum")
     @Expose
     private String date;
 
     public UpdateLine(){}
 
-    public UpdateLine(int line, int bus, String lat, String lon, String date) {
+    public UpdateLine(String line, String bus, Double lat, Double lon, String date) {
         this.line = line;
         this.bus = bus;
         this.lat = lat;
@@ -30,35 +30,35 @@ public class UpdateLine {
         this.date = date;
     }
 
-    public int getLine() {
+    public String getLine() {
         return line;
     }
 
-    public void setLine(Integer vonalId) {
+    public void setLine(String vonalId) {
         this.line = vonalId;
     }
 
-    public int getBus() {
+    public String getBus() {
         return bus;
     }
 
-    public void setBus(Integer buszId) {
+    public void setBus(String buszId) {
         this.bus = buszId;
     }
 
-    public String getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(String lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
-    public String getLon() {
+    public Double getLon() {
         return lon;
     }
 
-    public void setLon(String lon) {
+    public void setLon(Double lon) {
         this.lon = lon;
     }
 
