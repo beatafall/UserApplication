@@ -10,12 +10,29 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.utasapplikacio.Class.Bus;
+import com.example.utasapplikacio.Class.Line;
+import com.example.utasapplikacio.Retrofit.UserService;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MessageForm extends AppCompatActivity implements LocationListener {
 
@@ -60,6 +77,7 @@ public class MessageForm extends AppCompatActivity implements LocationListener {
         Location location = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
 
         onLocationChanged(location);
+
     }
 
     public void getCurrentTime(View view) {

@@ -1,37 +1,62 @@
 package com.example.utasapplikacio;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.utasapplikacio.Class.Bus;
+import com.example.utasapplikacio.Class.BusesOnTheRoad;
+import com.example.utasapplikacio.Class.Line;
+import com.example.utasapplikacio.Class.LineStations;
+import com.example.utasapplikacio.Retrofit.UserService;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class ViewLine extends AppCompatActivity implements OnMapReadyCallback {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+    public class ViewLine extends FragmentActivity implements OnMapReadyCallback{
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int REQUEST_CODE = 101;
-    TextView lat, lon;
+    GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +66,86 @@ public class ViewLine extends AppCompatActivity implements OnMapReadyCallback {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLastLocation();
 
-        lat=findViewById(R.id.lat2);
-        lon=findViewById(R.id.lon2);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(UserService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        UserService userService = retrofit.create(UserService.class);
+        Call<List<LineStations>> call = userService.getLineStations();
+        call.enqueue(new Callback<List<LineStations>>() {
+            @Override
+            public void onResponse(Call<List<LineStations>> call, Response<List<LineStations>> response) {
+                List<LineStations> lineStations = response.body();
+
+                Bundle extras = getIntent().getExtras();
+
+                if(extras != null) {
+                    String line = getIntent().getStringExtra("line");
+                    for (LineStations l : lineStations) {
+                        if(l.getLineId().toString().equals(line)){
+
+                            MarkerOptions markerOptions = new MarkerOptions();
+
+                            LatLng latLng = new LatLng(l.getLat(), l.getLon());
+                            markerOptions.position(latLng);
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                            markerOptions.title(l.getStationName());
+                            Marker m = mMap.addMarker(markerOptions);
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                            mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<LineStations>> call, Throwable t) {
+                Toast.makeText(ViewLine.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Call<List<BusesOnTheRoad>> callBusesOnTheRoad = userService.getBuses();
+        callBusesOnTheRoad.enqueue(new Callback<List<BusesOnTheRoad>>() {
+            @Override
+            public void onResponse(Call<List<BusesOnTheRoad>> call, Response<List<BusesOnTheRoad>> response) {
+                List<BusesOnTheRoad> buses = response.body();
+
+                Bundle extras = getIntent().getExtras();
+
+                if(extras != null) {
+                    String line = getIntent().getStringExtra("line");
+                    for (BusesOnTheRoad bus : buses) {
+                        Log.d("h",bus.getLine().toString());
+                        if(bus.getLine().toString().equals(line)){
+                            Log.d("h2",bus.getLine().toString());
+                            MarkerOptions markerOptions2 = new MarkerOptions();
+
+                            LatLng latLng = new LatLng(bus.getLat(), bus.getLon());
+
+                            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                            markerOptions2.icon(bitmapDescriptor);
+                            markerOptions2.position(latLng);
+                            markerOptions2.title("Vonal: " + bus.getLine()+ "  Idő: " + bus.getDate());
+                            //markerOptions2.snippet("Vonal: " + bus.getLine().toString() + "\n"+ "Idő: " + bus.getDate() );
+                            Marker m = mMap.addMarker(markerOptions2);
+
+                            m.showInfoWindow();
+
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<BusesOnTheRoad>> call, Throwable t) {
+                Toast.makeText(ViewLine.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -67,19 +170,20 @@ public class ViewLine extends AppCompatActivity implements OnMapReadyCallback {
         });
     }
 
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
+        mMap=googleMap;
+
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        double latitude= currentLocation.getLatitude();
-        double longitude= currentLocation.getLongitude();
 
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("I am here");
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("Tartozkodási hely");
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-        googleMap.addMarker(markerOptions);
+        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
 
-        lat.setText("" + latitude);
-        lon.setText("" + longitude);
+        markerOptions.icon(bitmapDescriptor);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        mMap.addMarker(markerOptions);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
     @Override
