@@ -22,17 +22,9 @@ import android.widget.Toast;
 import com.example.utasapplikacio.Class.Bus;
 import com.example.utasapplikacio.Class.BusesOnTheRoad;
 import com.example.utasapplikacio.Class.Line;
-import com.example.utasapplikacio.Class.UpdateLine;
+import com.example.utasapplikacio.Class.UpdateAndAddLine;
 import com.example.utasapplikacio.Retrofit.ApiUtils;
 import com.example.utasapplikacio.Retrofit.UserService;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,8 +34,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Signal extends AppCompatActivity implements LocationListener, AdapterView.OnItemSelectedListener {
 
@@ -67,7 +57,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
         btn_getCurentTime = findViewById(R.id.btn_time);
         btn_update = findViewById(R.id.update);
 
-        final UpdateLine updateLine = new UpdateLine();
+        final UpdateAndAddLine newLine = new UpdateAndAddLine();
 
         btn_getCurentTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +66,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
                 String currentDateandTime = sdf.format(new Date());
                 currentTime.setText(currentDateandTime);
-                updateLine.setDate(currentDateandTime);
+                newLine.setDate(currentDateandTime);
             }
         });
 
@@ -97,8 +87,8 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
 
         onLocationChanged(location);
 
-        updateLine.setLat(location.getLongitude());
-        updateLine.setLon(location.getLatitude());
+        newLine.setLat(location.getLongitude());
+        newLine.setLon(location.getLatitude());
 
         userService= ApiUtils.getAPIService();
 
@@ -124,7 +114,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         selectedLine = line.getSelectedItem().toString();
-                        updateLine.setLine(selectedLine);
+                        newLine.setLine(selectedLine);
                     }
 
                     @Override
@@ -162,7 +152,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         selectedBus=bus.getSelectedItem().toString();
-                        updateLine.setBus(selectedBus);
+                        newLine.setBus(selectedBus);
                     }
 
                     @Override
@@ -179,21 +169,22 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
         });
 
 
+
         btn_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               updateLine(updateLine.getBus(),updateLine.getLine(),updateLine.getLon(),updateLine.getLat(),updateLine.getDate());
+                updateLine(newLine.getBus(),newLine.getLine(),newLine.getLon(),newLine.getLat(),newLine.getDate());
             }
         });
 
 
     }
 
-    public void updateLine(String bus,String line, Double lon, Double lat, String date){
+    public void updateLine(String bus, String line, Double lon, Double lat, String date){
 
-       userService.updateLine(bus,line,bus, lon, lat, date).enqueue(new Callback<UpdateLine>() {
+       userService.updateLine(bus, line, bus, lon, lat, date).enqueue(new Callback<UpdateAndAddLine>() {
             @Override
-            public void onResponse(Call<UpdateLine> call, Response<UpdateLine> response) {
+            public void onResponse(Call<UpdateAndAddLine> call, Response<UpdateAndAddLine> response) {
                 if(response.isSuccessful()){
                     Toast.makeText(Signal.this, "Sikeresen frissítette a busz helyzetét!", Toast.LENGTH_SHORT).show();
                     Log.d("successful","successful");
@@ -201,7 +192,7 @@ public class Signal extends AppCompatActivity implements LocationListener, Adapt
             }
 
             @Override
-            public void onFailure(Call<UpdateLine> call, Throwable t) {
+            public void onFailure(Call<UpdateAndAddLine> call, Throwable t) {
                 Toast.makeText(Signal.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.d("not successful","not successful");
             }

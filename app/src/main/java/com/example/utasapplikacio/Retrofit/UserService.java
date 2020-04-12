@@ -1,26 +1,20 @@
 package com.example.utasapplikacio.Retrofit;
 
-import android.content.Intent;
-
 import com.example.utasapplikacio.Class.Bus;
 import com.example.utasapplikacio.Class.BusesOnTheRoad;
 import com.example.utasapplikacio.Class.Line;
 import com.example.utasapplikacio.Class.LineStations;
 import com.example.utasapplikacio.Class.MessageType;
 import com.example.utasapplikacio.Class.Messages;
-import com.example.utasapplikacio.Class.UpdateLine;
-import com.google.gson.JsonArray;
-
-import org.json.JSONArray;
+import com.example.utasapplikacio.Class.UpdateAndAddLine;
 
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
-import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -53,8 +47,7 @@ public interface UserService {
 
     @FormUrlEncoded
     @PUT("busesontheroad/{buszId}/")
-    Call<UpdateLine> updateLine(@Path("buszId") String id, @Field("vonalId") String line,
-                                @Field("buszId") String bus, @Field("lon") Double lon,
-                                @Field("lat") Double lat, @Field("datum") String date);
-
+    Call<UpdateAndAddLine> updateLine(@Path("buszId") String id, @Field("vonalId") String line,
+                                      @Field("buszId") String bus, @Field("lon") Double lon,
+                                      @Field("lat") Double lat, @Field("datum") String date);
 }

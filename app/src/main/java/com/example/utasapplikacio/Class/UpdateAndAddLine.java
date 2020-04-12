@@ -3,7 +3,7 @@ package com.example.utasapplikacio.Class;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class UpdateLine {
+public class UpdateAndAddLine {
     @SerializedName("vonalId")
     @Expose
     private String line;
@@ -20,9 +20,9 @@ public class UpdateLine {
     @Expose
     private String date;
 
-    public UpdateLine(){}
+    public UpdateAndAddLine(){}
 
-    public UpdateLine(String line, String bus, Double lat, Double lon, String date) {
+    public UpdateAndAddLine(String line, String bus, Double lat, Double lon, String date) {
         this.line = line;
         this.bus = bus;
         this.lat = lat;

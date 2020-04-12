@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.utasapplikacio.Class.Line;
+import com.example.utasapplikacio.Retrofit.ApiUtils;
 import com.example.utasapplikacio.Retrofit.UserService;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button btn_seatch, btn_signal, btn_message;
     String selectedLine;
     Spinner spinner;
+    UserService userService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,14 +46,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btn_message=findViewById(R.id.btn_message);
         spinner =findViewById(R.id.spinnerLines);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(UserService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        userService= ApiUtils.getAPIService();
 
-        UserService userService = retrofit.create(UserService.class);
-        Call<List<Line>> call = userService.getLines();
-        call.enqueue(new Callback<List<Line>>() {
+        userService.getLines().enqueue(new Callback<List<Line>>() {
             @Override
             public void onResponse(Call<List<Line>> call, Response<List<Line>> response) {
                 List<Line> lines = response.body();

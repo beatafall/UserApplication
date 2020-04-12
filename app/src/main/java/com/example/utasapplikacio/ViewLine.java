@@ -24,6 +24,7 @@ import com.example.utasapplikacio.Class.Bus;
 import com.example.utasapplikacio.Class.BusesOnTheRoad;
 import com.example.utasapplikacio.Class.Line;
 import com.example.utasapplikacio.Class.LineStations;
+import com.example.utasapplikacio.Retrofit.ApiUtils;
 import com.example.utasapplikacio.Retrofit.UserService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -57,23 +58,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int REQUEST_CODE = 101;
     GoogleMap mMap;
+    UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_line);
 
+        userService= ApiUtils.getAPIService();
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLastLocation();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(UserService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        UserService userService = retrofit.create(UserService.class);
-        Call<List<LineStations>> call = userService.getLineStations();
-        call.enqueue(new Callback<List<LineStations>>() {
+        userService.getLineStations().enqueue(new Callback<List<LineStations>>() {
             @Override
             public void onResponse(Call<List<LineStations>> call, Response<List<LineStations>> response) {
                 List<LineStations> lineStations = response.body();
@@ -89,7 +86,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
                             LatLng latLng = new LatLng(l.getLat(), l.getLon());
                             markerOptions.position(latLng);
-                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
                             markerOptions.title(l.getStationName());
                             Marker m = mMap.addMarker(markerOptions);
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -124,11 +121,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
                             LatLng latLng = new LatLng(bus.getLat(), bus.getLon());
 
-                            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
                             markerOptions2.icon(bitmapDescriptor);
                             markerOptions2.position(latLng);
-                            markerOptions2.title("Vonal: " + bus.getLine()+ "  Idő: " + bus.getDate());
-                            //markerOptions2.snippet("Vonal: " + bus.getLine().toString() + "\n"+ "Idő: " + bus.getDate() );
+                            markerOptions2.title( "Idő: " + bus.getDate());
                             Marker m = mMap.addMarker(markerOptions2);
 
                             m.showInfoWindow();
@@ -177,7 +173,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
         MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("Tartozkodási hely");
 
-        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
 
         markerOptions.icon(bitmapDescriptor);
 
